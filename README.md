@@ -8,7 +8,7 @@ There are many many versions. Generally it is considered Public Domain software,
 
 This fork is based on [Werner Randelshofer's Java port](http://www.randelshofer.ch/blog/2010/07/screenmate-neko-in-java).
 
-This initial commit contains Randelshofer's executable jar, containing the source. His description states:
+This initial commit contains his source, extracted from the jar. His description states:
 
 > Feel free to copy the source code and images. You can change it if you like, for your own Neko Java program.
 
