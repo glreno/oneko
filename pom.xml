@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<!--
+Copyright (c) 2019 Gerald Reno, Jr. Public domain, released under the Unlicense http://unlicense.org
+-->
+
+<modelVersion>4.0.0</modelVersion>
+
+<groupId>oneko</groupId>
+<artifactId>oneko</artifactId>
+<version>0.01-SNAPSHOT</version>
+
+<name>oneko</name>
+<description>A kitty that chases your mouse!</description>
+
+<licenses>
+    <license>
+        <name>Unlicense</name>
+        <url>http://unlicense.org</url>
+        <distribution>repo</distribution>
+    </license>
+</licenses>
+
+
+<properties>
+    <jdkVersion>1.8</jdkVersion>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+</properties>
+
+<build>
+    <defaultGoal>install</defaultGoal>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.0.1</version>
+            <executions>
+                <execution>
+                    <id>attach-sources</id>
+                    <goals>
+                        <goal>jar-no-fork</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <includePom>true</includePom>
+                <attach>true</attach>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.1.1</version>
+            <configuration>
+                <archive>
+                    <manifestEntries>
+                        <Main-Class>Neko</Main-Class>
+                    </manifestEntries>
+                </archive>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+
+</project>
