@@ -11,7 +11,7 @@
  * http://mysite.ncnetwork.net/res8t1xo/class/neko.htm
  */
 
-import com.sun.awt.AWTUtilities;
+import java.awt.Color;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Insets;
@@ -74,7 +74,7 @@ public class Neko extends javax.swing.JWindow {
     /** Creates new form Neko */
     public Neko() {
         getRootPane().putClientProperty("Window.shadow", false);
-        AWTUtilities.setWindowOpaque(this, false);
+		setBackground(new Color(200,200,200,0)); // transparent, light grey of not supported
         setAlwaysOnTop(true);
 
         initComponents();
