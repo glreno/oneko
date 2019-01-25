@@ -1,5 +1,5 @@
 /*
- * @(#)Neko.java  1.1  2019-01-25
+ * @(#)Neko.java  1.1  2019-01-24
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -94,9 +94,14 @@ public class Neko {
     private JFrame catbox;
     private JWindow invisibleWindow;
     private JLabel freeLabel,boxLabel;
+	private Settings settings;
 
     /** Creates new form Neko */
     public Neko() {
+		settings=new Settings("neko.properties");
+		settings.load();
+		String hello=settings.getString("hello");
+		if ( hello!=null ) System.out.println(hello);
         catbox=new JFrame("O-Neko");
         catbox.setBackground(new Color(200,200,200,255));
         catbox.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
