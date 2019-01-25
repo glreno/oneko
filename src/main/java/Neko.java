@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JWindow;
 import javax.swing.Timer;
 
 /**
@@ -41,7 +42,7 @@ import javax.swing.Timer;
  * cat sleeps.
  * <br>1.0 2010-07-16 Created.
  */
-public class Neko extends javax.swing.JWindow {
+public class Neko {
     //
     //Constants
 
@@ -69,18 +70,23 @@ public class Neko extends javax.swing.JWindow {
     private Point windowOffset = new Point(-16, -30);
     private Rectangle nekoBounds = new Rectangle();
     private Timer timer;
+
+	//
+	// UI Components
+	private JWindow invisibleWindow;
     private JLabel imageLabel;
 
     /** Creates new form Neko */
     public Neko() {
-        getRootPane().putClientProperty("Window.shadow", false);
-		setBackground(new Color(200,200,200,0)); // transparent, light grey of not supported
-        setAlwaysOnTop(true);
+		invisibleWindow=new JWindow();
+        invisibleWindow.getRootPane().putClientProperty("Window.shadow", false);
+		invisibleWindow.setBackground(new Color(200,200,200,0)); // transparent, light grey of not supported
+        invisibleWindow.setAlwaysOnTop(true);
 
         initComponents();
         loadKitten();
-        setSize(image[1].getIconWidth(), image[1].getIconHeight());
-        setLocation(ox + windowOffset.x, oy + windowOffset.y);
+        invisibleWindow.setSize(image[1].getIconWidth(), image[1].getIconHeight());
+        invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
 
         timer = new Timer(200, new ActionListener() {
 
@@ -106,9 +112,9 @@ public class Neko extends javax.swing.JWindow {
         FormListener formListener = new FormListener();
 
         imageLabel.addMouseListener(formListener);
-        getContentPane().add(imageLabel, java.awt.BorderLayout.CENTER);
+        invisibleWindow.getContentPane().add(imageLabel, java.awt.BorderLayout.CENTER);
 
-        pack();
+        invisibleWindow.pack();
     }
 
     // Code for dispatching events from components to event handlers.
@@ -145,10 +151,20 @@ public class Neko extends javax.swing.JWindow {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new Neko().setVisible(true);
+                new Neko().setWindowMode(false);
             }
         });
     }
+
+	public void setWindowMode(boolean windowed)
+	{
+		if (windowed) {
+			invisibleWindow.setVisible(false);
+		}
+		else {
+			invisibleWindow.setVisible(true);
+		}
+	}
 
     private void loadKitten() {
         image = new ImageIcon[33];
@@ -169,7 +185,7 @@ public class Neko extends javax.swing.JWindow {
         if ( gc==null) return;
         Rectangle screenBounds = gc.getBounds();
         if ( screenBounds==null) return;
-        Insets screenInsets = getToolkit().getScreenInsets(gc);
+        Insets screenInsets = invisibleWindow.getToolkit().getScreenInsets(gc);
         if ( screenInsets==null) return;
 
         int mx = mouseLocation.x;
@@ -406,7 +422,7 @@ public class Neko extends javax.swing.JWindow {
             init++;
         }
         //draw the new image
-        setLocation(ox + windowOffset.x, oy + windowOffset.y);
+        invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
         imageLabel.setIcon(image[no]);
     }
 }
