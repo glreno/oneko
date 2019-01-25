@@ -1,6 +1,11 @@
 /*
- * @(#)Neko.java  1.0  2010-07-16
+ * @(#)Neko.java  1.1  2019-01-25
  *
+ * Copyright (c) 2019 Jerry Reno
+ * This is public domain software, under the terms of the UNLICENSE
+ * http://unlicense.org 
+ * 
+ * This is an extended version of the earlier Java Neko:
  * Copyright (c) 2010 Werner Randelshofer
  * Hausmatt 10, Immensee, CH-6405, Switzerland.
  *
@@ -11,10 +16,12 @@
  * http://mysite.ncnetwork.net/res8t1xo/class/neko.htm
  */
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Insets;
@@ -26,6 +33,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -58,8 +67,8 @@ public class Neko {
     private static final int under = 2;
     private static final int left = 3;
     private static final int right = 4;
-	private static Dimension MINSIZE=new Dimension(64,64);
-	private static Dimension PRFSIZE=new Dimension(64*16,64*9);
+    private static Dimension MINSIZE=new Dimension(64,64);
+    private static Dimension PRFSIZE=new Dimension(64*16,64*9);
     //
     //Variables
     private boolean windowMode;
@@ -98,8 +107,8 @@ public class Neko {
 
         initComponents();
         loadKitten();
-		int w=image[1].getIconWidth();
-		int h=image[1].getIconHeight();
+        int w=image[1].getIconWidth();
+        int h=image[1].getIconHeight();
         invisibleWindow.setSize(w,h);
         invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
         boxLabel.setSize(w,h);
@@ -131,47 +140,47 @@ public class Neko {
 
         freeLabel.addMouseListener(formListener);
         boxLabel.addMouseListener(formListener);
-        invisibleWindow.getContentPane().add(freeLabel, java.awt.BorderLayout.CENTER);
+        invisibleWindow.getContentPane().add(freeLabel, BorderLayout.CENTER);
         catbox.getContentPane().add(boxLabel);
         catbox.pack();
 
-		// We really don't want a layout manager messing with us.
-		// Maybe this class should BE a layout manager.
-		catbox.getContentPane().setLayout(new LayoutManager() {
-			public void addLayoutComponent(String n,Component c) {}
-			public void layoutContainer(Container p){}
-			public Dimension minimumLayoutSize(Container p) { return MINSIZE;}
-			public Dimension preferredLayoutSize(Container p) { return PRFSIZE;}
-			public void removeLayoutComponent(Component c) {}
-		});
+        // We really don't want a layout manager messing with us.
+        // Maybe this class should BE a layout manager.
+        catbox.getContentPane().setLayout(new LayoutManager() {
+            public void addLayoutComponent(String n,Component c) {}
+            public void layoutContainer(Container p){}
+            public Dimension minimumLayoutSize(Container p) { return MINSIZE;}
+            public Dimension preferredLayoutSize(Container p) { return PRFSIZE;}
+            public void removeLayoutComponent(Component c) {}
+        });
 
         invisibleWindow.pack();
     }
 
     // Code for dispatching events from components to event handlers.
 
-    private class FormListener implements java.awt.event.MouseListener {
+    private class FormListener implements MouseListener {
         FormListener() {}
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
+        public void mouseClicked(MouseEvent evt) {
             if ((evt.getSource() == freeLabel)||(evt.getSource() == boxLabel)) {
                 Neko.this.imageClicked(evt);
             }
         }
 
-        public void mouseEntered(java.awt.event.MouseEvent evt) {
+        public void mouseEntered(MouseEvent evt) {
         }
 
-        public void mouseExited(java.awt.event.MouseEvent evt) {
+        public void mouseExited(MouseEvent evt) {
         }
 
-        public void mousePressed(java.awt.event.MouseEvent evt) {
+        public void mousePressed(MouseEvent evt) {
         }
 
-        public void mouseReleased(java.awt.event.MouseEvent evt) {
+        public void mouseReleased(MouseEvent evt) {
         }
     }
 
-    private void imageClicked(java.awt.event.MouseEvent evt) {
+    private void imageClicked(MouseEvent evt) {
         setWindowMode(!windowMode);
     }
 
@@ -179,7 +188,7 @@ public class Neko {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
 
             public void run() {
                 new Neko().setWindowMode(false);
@@ -217,35 +226,35 @@ public class Neko {
         int mx = mouseLocation.x;
         int my = mouseLocation.y;
 
-		if(windowMode)
-		{
-			// nekoBounds is the area of the window that the Neko can be in
-			Point panePoint = catbox.getContentPane().getLocationOnScreen();
-			Insets paneInsets=catbox.getContentPane().getInsets();
-			Dimension sz=catbox.getContentPane().getSize();
+        if(windowMode)
+        {
+            // nekoBounds is the area of the window that the Neko can be in
+            Point panePoint = catbox.getContentPane().getLocationOnScreen();
+            Insets paneInsets=catbox.getContentPane().getInsets();
+            Dimension sz=catbox.getContentPane().getSize();
 
-			nekoBounds.x = panePoint.x + paneInsets.left + 16;
-			nekoBounds.y = panePoint.y + paneInsets.top + 32;
-			nekoBounds.width = sz.width - paneInsets.left - paneInsets.right - 32;
-			nekoBounds.height = sz.height - paneInsets.left - paneInsets.top - 32;
-		}
-		else
-		{
-			GraphicsDevice mouseMonitor=pointerInfo.getDevice();
-			if (mouseMonitor==null) return;
-			GraphicsConfiguration gc = mouseMonitor.getDefaultConfiguration();
-			if ( gc==null) return;
-			Rectangle screenBounds = gc.getBounds();
-			if ( screenBounds==null) return;
-			Toolkit tk = invisibleWindow.getToolkit();
-			Insets screenInsets = tk.getScreenInsets(gc);
-			if ( screenInsets==null) return;
-			// nekoBounds is the area of the screen that the Neko can be in
-			nekoBounds.x = screenBounds.x + screenInsets.left + 16;
-			nekoBounds.y = screenBounds.y + screenInsets.top + 32;
-			nekoBounds.width = screenBounds.width - screenInsets.left - screenInsets.right - 32;
-			nekoBounds.height = screenBounds.height - screenInsets.left - screenInsets.top - 32;
-		}
+            nekoBounds.x = panePoint.x + paneInsets.left + 16;
+            nekoBounds.y = panePoint.y + paneInsets.top + 32;
+            nekoBounds.width = sz.width - paneInsets.left - paneInsets.right - 32;
+            nekoBounds.height = sz.height - paneInsets.left - paneInsets.top - 32;
+        }
+        else
+        {
+            GraphicsDevice mouseMonitor=pointerInfo.getDevice();
+            if (mouseMonitor==null) return;
+            GraphicsConfiguration gc = mouseMonitor.getDefaultConfiguration();
+            if ( gc==null) return;
+            Rectangle screenBounds = gc.getBounds();
+            if ( screenBounds==null) return;
+            Toolkit tk = invisibleWindow.getToolkit();
+            Insets screenInsets = tk.getScreenInsets(gc);
+            if ( screenInsets==null) return;
+            // nekoBounds is the area of the screen that the Neko can be in
+            nekoBounds.x = screenBounds.x + screenInsets.left + 16;
+            nekoBounds.y = screenBounds.y + screenInsets.top + 32;
+            nekoBounds.width = screenBounds.width - screenInsets.left - screenInsets.right - 32;
+            nekoBounds.height = screenBounds.height - screenInsets.left - screenInsets.top - 32;
+        }
 
         //Determines what the cat should do, if the mouse moves
         out = !nekoBounds.contains(mx, my);
@@ -277,9 +286,9 @@ public class Neko {
             }
 
         }
-    	//image-mouse distance
-		// x,y are the mouse location on screen
-		// ox,oy are the old neko location on screen
+        //image-mouse distance
+        // x,y are the mouse location on screen
+        // ox,oy are the old neko location on screen
         int dx = x - ox;
         int dy = oy - y;
         dist = Math.sqrt(dx * dx + dy * dy); //distance formula (from mouse to cat)
@@ -295,7 +304,7 @@ public class Neko {
         //
         if (dist > 16) { //moves cat 16 pixels
             slp = 200;
-			// note that ox,oy are screen-relative
+            // note that ox,oy are screen-relative
             ox = (int) (ox + Math.cos(theta) * 16);
             oy = (int) (oy - Math.sin(theta) * 16);
             dist = dist - 16;
@@ -477,13 +486,13 @@ public class Neko {
             init++;
         }
         //draw the new image
-		if(windowMode) {
-			// note that ox,oy are screen-relative
+        if(windowMode) {
+            // note that ox,oy are screen-relative
             boxLabel.setLocation(ox-nekoBounds.x, oy-nekoBounds.y);
-		}
-		else {
-        	invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
-		}
+        }
+        else {
+            invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
+        }
         freeLabel.setIcon(image[no]);
         boxLabel.setIcon(image[no]);
     }
