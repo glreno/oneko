@@ -1,5 +1,5 @@
 /*
- * @(#)Neko.java  1.1  2019-01-24
+ * @(#)Neko.java  1.1  2019-01-25
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -69,6 +69,20 @@ public class Neko {
     private static final int right = 4;
     private static Dimension MINSIZE=new Dimension(64,64);
     private static Dimension PRFSIZE=new Dimension(64*16,64*9);
+
+
+    // Settings keys:
+    private static final String HELLO = "hello";
+    private static final String TITLE = "windowTitle";
+    private static final String TRIGGER_DIST = "triggerDistance";
+    private static final String RUN_DIST = "runDistancePerFrame";
+
+    private static final String MAX_FRAMERATE = "maxFramerate";
+    private static final String RUN_FRAMERATE = "runFramerate";
+    private static final String SIT_FRAMERATE = "sitFramerate";
+    private static final String SCRATCH_FRAMERATE = "scratchFramerate";
+    private static final String SLEEP_FRAMERATE = "sleepFramerate";
+    private static final String LOAD_FRAMERATE = "loadFramerate";
     //
     //Variables
     private boolean windowMode;
@@ -94,15 +108,18 @@ public class Neko {
     private JFrame catbox;
     private JWindow invisibleWindow;
     private JLabel freeLabel,boxLabel;
-	private Settings settings;
+    private Settings settings;
 
     /** Creates new form Neko */
     public Neko() {
-		settings=new Settings("neko.properties");
-		settings.load();
-		String hello=settings.getString("hello");
-		if ( hello!=null ) System.out.println(hello);
-        catbox=new JFrame("O-Neko");
+        settings=new Settings("neko.properties");
+        settings.load();
+        String hello=settings.getString(HELLO);
+        if ( hello!=null ) System.out.println(hello);
+        String title=settings.getString(TITLE);
+        if ( title==null ) title="Neko";
+        System.out.println(title);
+        catbox=new JFrame(title);
         catbox.setBackground(new Color(200,200,200,255));
         catbox.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         invisibleWindow=new JWindow();
@@ -287,7 +304,7 @@ public class Neko {
             x = mx;
             y = my;
             if (move) {
-                slp = Math.min(slp, 200);
+                slp = Math.min(slp, getDelay(MAX_FRAMERATE) ); // 10fps, 100ms
             }
 
         }
@@ -300,15 +317,21 @@ public class Neko {
         theta = Math.atan2(dy, dx);     //angle from mouse to cat
         //
         slp = Math.max(0, slp - timer.getDelay());
-        if (slp == 0) {
+        if (slp == 0)
+        {
             animateCat();
         }
     }
 
-    private void animateCat() {
-        //
-        if (dist > 16) { //moves cat 16 pixels
-            slp = 200;
+    private void animateCat()
+    {
+        boolean doMove=false;
+        Integer triggerDist = settings.getInt(TRIGGER_DIST);
+        if ( triggerDist==null ) triggerDist=16;
+        if (dist > triggerDist )
+        {
+            doMove=true;
+            slp = getDelay(RUN_FRAMERATE); // 5fps, 200ms
             // note that ox,oy are screen-relative
             ox = (int) (ox + Math.cos(theta) * 16);
             oy = (int) (oy - Math.sin(theta) * 16);
@@ -357,11 +380,12 @@ public class Neko {
         } else {   //-if the mouse hasn't moved or the cat's over the mouse-
             ox = x;
             oy = y;
-            slp = 800;
+            slp = getDelay(SIT_FRAMERATE);
             switch (no) {
                 case 25: //<cat sit>
                     //If the mouse is outside the applet
                     if (out == true) {
+                        slp = getDelay(SCRATCH_FRAMERATE);
                         switch (pos) {
                             case over:
                                 no = 17;
@@ -386,6 +410,7 @@ public class Neko {
                     break; //<31: cat lick>
                 //
                 case 17: //The mouse is outside, above applet
+                    slp = getDelay(SCRATCH_FRAMERATE);
                     no = 18;    //show images 17 & 18, 6 times
                     ilc1++;
                     if (ilc1 == 6) {
@@ -399,6 +424,7 @@ public class Neko {
                     break;
                 //
                 case 21: //The mouse is outside, under applet
+                    slp = getDelay(SCRATCH_FRAMERATE);
                     no = 22;    //show images 21 & 22, 6 times
                     ilc1++;
                     if (ilc1 == 6) {
@@ -412,6 +438,7 @@ public class Neko {
                     break;
                 //
                 case 23: //the mouse is outside, left
+                    slp = getDelay(SCRATCH_FRAMERATE);
                     no = 24;    //show images 23 & 24, 6 times
                     ilc1++;
                     if (ilc1 == 6) {
@@ -425,6 +452,7 @@ public class Neko {
                     break;
                 //
                 case 19: //The mouse is outside, right
+                    slp = getDelay(SCRATCH_FRAMERATE);
                     no = 20;    //show images 19 & 20, 6 times
                     ilc1++;
                     if (ilc1 == 6) {
@@ -447,6 +475,7 @@ public class Neko {
                     break;
                 //
                 case 27:
+                    slp = getDelay(SCRATCH_FRAMERATE);
                     no = 28;
                     break; //cat scratch (27 & 28, 4 times)
                 case 28:
@@ -459,15 +488,15 @@ public class Neko {
                     break;
                 case 26:
                     no = 29;
-                    slp = 1600;
+                    slp = getDelay(SLEEP_FRAMERATE);
                     break; //cat yawn (26)
                 case 29:
                     no = 30;
-                    slp = 1600;
+                    slp = getDelay(SLEEP_FRAMERATE);
                     break; //cat sleep (29 & 30, forever)
                 case 30:
                     no = 29;
-                    slp = 1600;
+                    slp = getDelay(SLEEP_FRAMERATE);
                     break;
                 default:
                     no = 25;
@@ -484,7 +513,7 @@ public class Neko {
         if (init < 33) {
             //tells the user the program is testing the images, and tells them
             //when the test is done.
-            slp = 200;
+            slp = getDelay(LOAD_FRAMERATE);
             ox = nekoBounds.x + nekoBounds.width / 2;
             oy = nekoBounds.y + nekoBounds.height / 2;
             no = init;
@@ -496,10 +525,23 @@ public class Neko {
             boxLabel.setLocation(ox-nekoBounds.x, oy-nekoBounds.y);
         }
         else {
-            invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
+            if ( doMove )
+            {
+                invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
+            }
         }
         freeLabel.setIcon(image[no]);
         boxLabel.setIcon(image[no]);
+    }
+
+    private int getDelay(String key)
+    {
+        // Convert the framerate settings into milliseconds
+        Integer ret = settings.getInt(key);
+        if ( ret==null )
+            return 100;
+
+        return 1000/ret;
     }
 }
 
