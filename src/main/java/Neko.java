@@ -19,12 +19,15 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.Timer;
+import javax.swing.WindowConstants;
 
 /**
  * Neko the cat.
@@ -53,6 +56,7 @@ public class Neko {
     private final int right = 4;
     //
     //Variables
+	private boolean windowMode;
     private int pos;      //neko's position
     private int x, y;     //mouse pos.
     private int ox, oy;   //image pos.
@@ -73,11 +77,15 @@ public class Neko {
 
 	//
 	// UI Components
+	private JFrame catbox;
 	private JWindow invisibleWindow;
-    private JLabel imageLabel;
+    private JLabel freeLabel,boxLabel;
 
     /** Creates new form Neko */
     public Neko() {
+		catbox=new JFrame("O-Neko");
+		catbox.setBackground(new Color(200,200,200,255));
+		catbox.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		invisibleWindow=new JWindow();
         invisibleWindow.getRootPane().putClientProperty("Window.shadow", false);
 		invisibleWindow.setBackground(new Color(200,200,200,0)); // transparent, light grey of not supported
@@ -87,6 +95,7 @@ public class Neko {
         loadKitten();
         invisibleWindow.setSize(image[1].getIconWidth(), image[1].getIconHeight());
         invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
+        catbox.setSize(16*image[1].getIconWidth(), 9*image[1].getIconHeight());
 
         timer = new Timer(200, new ActionListener() {
 
@@ -107,14 +116,18 @@ public class Neko {
     @SuppressWarnings("unchecked")
     private void initComponents() {
 
-        imageLabel = new JLabel();
+        freeLabel = new JLabel();
+        boxLabel = new JLabel();
 
         FormListener formListener = new FormListener();
 
-        imageLabel.addMouseListener(formListener);
-        invisibleWindow.getContentPane().add(imageLabel, java.awt.BorderLayout.CENTER);
+        freeLabel.addMouseListener(formListener);
+        boxLabel.addMouseListener(formListener);
+        invisibleWindow.getContentPane().add(freeLabel, java.awt.BorderLayout.CENTER);
+        catbox.getContentPane().add(boxLabel, java.awt.BorderLayout.CENTER);
 
         invisibleWindow.pack();
+        catbox.pack();
     }
 
     // Code for dispatching events from components to event handlers.
@@ -122,7 +135,7 @@ public class Neko {
     private class FormListener implements java.awt.event.MouseListener {
         FormListener() {}
         public void mouseClicked(java.awt.event.MouseEvent evt) {
-            if (evt.getSource() == imageLabel) {
+            if ((evt.getSource() == freeLabel)||(evt.getSource() == boxLabel)) {
                 Neko.this.imageClicked(evt);
             }
         }
@@ -141,7 +154,8 @@ public class Neko {
     }
 
     private void imageClicked(java.awt.event.MouseEvent evt) {
-        System.exit(0);
+		setWindowMode(!windowMode);
+//        System.exit(0);
     }
 
     /**
@@ -158,10 +172,13 @@ public class Neko {
 
 	public void setWindowMode(boolean windowed)
 	{
+		windowMode=windowed;
 		if (windowed) {
+			catbox.setVisible(true);
 			invisibleWindow.setVisible(false);
 		}
 		else {
+			catbox.setVisible(false);
 			invisibleWindow.setVisible(true);
 		}
 	}
@@ -185,7 +202,9 @@ public class Neko {
         if ( gc==null) return;
         Rectangle screenBounds = gc.getBounds();
         if ( screenBounds==null) return;
-        Insets screenInsets = invisibleWindow.getToolkit().getScreenInsets(gc);
+
+		Toolkit tk = windowMode?catbox.getToolkit():invisibleWindow.getToolkit();
+        Insets screenInsets = tk.getScreenInsets(gc);
         if ( screenInsets==null) return;
 
         int mx = mouseLocation.x;
@@ -423,7 +442,8 @@ public class Neko {
         }
         //draw the new image
         invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
-        imageLabel.setIcon(image[no]);
+        freeLabel.setIcon(image[no]);
+        boxLabel.setIcon(image[no]);
     }
 }
 
