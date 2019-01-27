@@ -9,7 +9,7 @@ Copyright (c) 2019 Gerald Reno, Jr. Public domain, released under the Unlicense 
 
 <groupId>oneko</groupId>
 <artifactId>oneko</artifactId>
-<version>2.00-SNAPSHOT</version>
+<version>2.0.0</version>
 
 <name>oneko</name>
 <description>A kitty that chases your mouse!</description>
