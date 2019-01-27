@@ -1,4 +1,6 @@
-# oneko
+oneko
+=====
+
 The ever popular kitty-that-follows-your-mouse-pointer toy.
 
 
@@ -9,5 +11,6 @@ There are many many versions. Generally it is considered Public Domain software,
 This fork is based on [Werner Randelshofer's Java port](http://www.randelshofer.ch/blog/2010/07/screenmate-neko-in-java).
 
 The image files are ancient public domain.
-The Java code is all (c) 2010 Werner Randelhofer.
-Modifications (c) 2019 Gerald Reno
+The Java code for v.1.0 is (c) 2010 Werner Randelhofer.
+The Java code for v.2.0 (c) 2019 Gerald Reno
+

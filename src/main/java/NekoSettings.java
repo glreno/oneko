@@ -1,5 +1,5 @@
 /*
- * @(#)NekoSettings.java  1.1  2019-01-27
+ * @(#)NekoSettings.java  2.0  2019-01-27
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE

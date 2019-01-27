@@ -1,11 +1,11 @@
 /*
- * @(#)Neko.java  1.1  2019-01-27
+ * @(#)Neko.java  2.0  2019-01-27
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
  * http://unlicense.org 
  * 
- * This is an extended version of the earlier Java Neko:
+ * This is an extended version of the earlier Java Neko 1.0:
  * Copyright (c) 2010 Werner Randelshofer
  * Hausmatt 10, Immensee, CH-6405, Switzerland.
  *

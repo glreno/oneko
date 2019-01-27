@@ -9,7 +9,7 @@ Copyright (c) 2019 Gerald Reno, Jr. Public domain, released under the Unlicense 
 
 <groupId>oneko</groupId>
 <artifactId>oneko</artifactId>
-<version>0.01-SNAPSHOT</version>
+<version>2.00-SNAPSHOT</version>
 
 <name>oneko</name>
 <description>A kitty that chases your mouse!</description>
@@ -24,9 +24,9 @@ Copyright (c) 2019 Gerald Reno, Jr. Public domain, released under the Unlicense 
 
 
 <properties>
-    <jdkVersion>1.8</jdkVersion>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <jdkVersion>1.6</jdkVersion>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 </properties>
 
