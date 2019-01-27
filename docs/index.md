@@ -16,4 +16,4 @@ The Java code for v.2.0 (c) 2019 Gerald Reno
 
 Download executable jar
 =====
-[Download v.2.0.0]:https://glreno.github.io/oneko/oneko-2.0.0.jar
+[Download v.2.0.0](https://glreno.github.io/oneko/oneko-2.0.0.jar)
