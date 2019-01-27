@@ -67,10 +67,11 @@ public class NekoController {
 	private int ox, oy;   //image pos.
 	private int no;	   //image number.
 	private int init;	 //for image loading initialize counter
+	private int state;
 	private int slp;	  //sleep time
 	private int ilc1;	 //image loop counter
 	private int ilc2;	 //second loop counter
-	private boolean move; //mouse move, flag
+	private boolean mouseMoved; //mouse move, flag
 	private boolean out;  //mouse exiseted, flag
 	private double theta;//image-mouse polar data
 	private double dist;  //distance
@@ -89,6 +90,8 @@ public class NekoController {
 
 	/** Creates new form Neko */
 	public NekoController(NekoSettings settings,JWindow invisibleWindow,JFrame visibleWindow,JLabel free,JLabel boxed) {
+		this.init=0;
+		this.state=0;
 		this.settings=settings;
 		this.invisibleWindow=invisibleWindow;
 		this.catbox=visibleWindow;
@@ -104,7 +107,7 @@ public class NekoController {
 		catbox.setSize(16*w, 9*h);
 
 
-		timer = new Timer(100, new ActionListener() {
+		timer = new Timer(50, new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -176,9 +179,9 @@ public class NekoController {
 
 		//Determines what the cat should do, if the mouse moves
 		out = !nekoBounds.contains(mx, my);
+		x = mx;
+		y = my;
 		if (out) {
-			x = mx;
-			y = my;
 			if (y < nekoBounds.y) {
 				y = nekoBounds.y;
 				pos = over;
@@ -195,16 +198,8 @@ public class NekoController {
 				x = nekoBounds.x + nekoBounds.width;
 				pos = right;
 			}
-		} else {
-			move = (x != mx || y != my);
-			x = mx;
-			y = my;
-			if (move) {
-				// Mouse moved! Wake up or change direction immediately!
-				//slp = Math.min(slp, settings.getMinDelay() ); // 10fps, 100ms
-			}
-
 		}
+
 		//image-mouse distance
 		// x,y are the mouse location on screen
 		// ox,oy are the old neko location on screen
@@ -212,6 +207,8 @@ public class NekoController {
 		int dy = oy - y;
 		dist = Math.sqrt(dx * dx + dy * dy); //distance formula (from mouse to cat)
 		theta = Math.atan2(dy, dx);	 //angle from mouse to cat
+
+		mouseMoved = mouseMoved || dist > settings.getTriggerDist();
 		//
 		slp = Math.max(0, slp - timer.getDelay());
 		if (slp == 0)
@@ -222,17 +219,43 @@ public class NekoController {
 
 	private void animateCat()
 	{
+		// There are four states.
+		// 0. Initialization (init<33)
+		// 1. Chasing the mouse (doMove=true)
+		// 2. sleeping or preparing to sleep
+		// 3. Surprised (was asleep, but the mouse moved) (no=32)
 		boolean doMove=false;
-		Integer triggerDist = settings.getTriggerDist();
-		if ( triggerDist==null ) triggerDist=16;
-		if (dist > triggerDist )
-		{
+		int triggerDist = settings.getTriggerDist();
+		if ( state==0 ) {
+			if (init < 33) {
+				doMove=true;
+				//tells the user the program is testing the images, and tells them
+				//when the test is done.
+				slp = settings.getLoadDelay();
+				ox = nekoBounds.x + nekoBounds.width / 2;
+				oy = nekoBounds.y + nekoBounds.height / 2;
+				no = init;
+				init++;
+			}
+			else {
+				state=1;
+			}
+		}
+		else if ( state==1 ) {
 			doMove=true;
 			slp = settings.getRunDelay(); // 5fps, 200ms
 			// note that ox,oy are screen-relative
-			ox = (int) (ox + Math.cos(theta) * 16);
-			oy = (int) (oy - Math.sin(theta) * 16);
-			dist = dist - 16;
+			double run=settings.getRunDist(); // 16
+			if ( run>dist ) {
+				run=dist;
+			}
+			ox = (int) (ox + Math.cos(theta) * run);
+			oy = (int) (oy - Math.sin(theta) * run);
+			dist = dist - run;
+			if ( dist < settings.getCatchDist() ) {
+				// mouse has been caught!
+				state=2;
+			}
 
 			/*
 			The following conditions determine what image should be shown.
@@ -272,11 +295,14 @@ public class NekoController {
 			{
 				no = (no == 7) ? 8 : 7;
 			}
-			//sets move back to false
-			move = false;
-		} else {   //-if the mouse hasn't moved or the cat's over the mouse-
-			ox = x;
-			oy = y;
+			//We have moved toward the mouse, so set mouseMoved back to false
+			mouseMoved = false;
+		}
+		else {   //-if the mouse hasn't moved or the cat's over the mouse-
+			// state is 2 ; it stays at 2 until the mouse moves
+			// When it moves, go to state 3, show surprise, and then to state 1
+//			ox = x;
+//			oy = y;
 			switch (no) {
 				case 0: //<cat sit>
 					//If the mouse is outside the applet
@@ -412,32 +438,26 @@ public class NekoController {
 					no = 0;
 					break;
 			}
-			if (move == true) {
+			if (mouseMoved ) {
+				// State 3. Go to state 1 and chase the mouse,
+				// after a suitable delay.
 				//re-initialize some variables
 				slp = settings.getSurpriseDelay();
 				no = 32;
 				ilc1 = 0;
 				ilc2 = 0;
-				move = false;
+				//mouseMoved = false;
+				state=1;
 			}
 		}
-		if (init < 33) {
-			//tells the user the program is testing the images, and tells them
-			//when the test is done.
-			slp = settings.getLoadDelay();
-			ox = nekoBounds.x + nekoBounds.width / 2;
-			oy = nekoBounds.y + nekoBounds.height / 2;
-			no = init;
-			init++;
-		}
 		//draw the new image
-		if(windowMode) {
-			// note that ox,oy are screen-relative
-			boxLabel.setLocation(ox-nekoBounds.x, oy-nekoBounds.y);
-		}
-		else {
-			if ( doMove )
-			{
+		if ( doMove )
+		{
+			if(windowMode) {
+				// note that ox,oy are screen-relative
+				boxLabel.setLocation(ox-nekoBounds.x, oy-nekoBounds.y);
+			}
+			else {
 				invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
 			}
 		}

@@ -38,6 +38,7 @@ public class NekoSettings {
 	private static final String HELLO = "hello";
 	private static final String TITLE = "windowTitle";
 	private static final String TRIGGER_DIST = "triggerDistance";
+	private static final String CATCH_DIST = "catchDistance";
 	private static final String RUN_DIST = "runDistancePerFrame";
 
 	private static final String MAX_FRAMERATE = "maxFramerate";
@@ -52,6 +53,8 @@ public class NekoSettings {
 
 	private Settings settings;
 	private int triggerDist;
+	private int catchDist;
+	private int runDist;
 	private int minDelay;
 	private int runDelay;
 	private int sitDelay;
@@ -81,6 +84,8 @@ public class NekoSettings {
 	}
 
 	public int getTriggerDist() { return triggerDist;}
+	public int getCatchDist() { return catchDist;}
+	public int getRunDist() { return runDist;}
 	public int getMinDelay() { return minDelay;}
 	public int getRunDelay() { return runDelay;}
 	public int getSitDelay() { return sitDelay;}
@@ -100,6 +105,12 @@ public class NekoSettings {
 		Integer i;
 		i = settings.getInt(TRIGGER_DIST);
 		triggerDist=(i==null)?16:i;
+
+		i = settings.getInt(CATCH_DIST);
+		catchDist=(i==null)?16:i;
+
+		i = settings.getInt(RUN_DIST);
+		runDist=(i==null)?16:i;
 
 		i = settings.getInt(SLEEP_DELAY);
 		sleepDelay=(i==null)?1000:i;
