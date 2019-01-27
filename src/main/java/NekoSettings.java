@@ -43,9 +43,12 @@ public class NekoSettings {
 	private static final String MAX_FRAMERATE = "maxFramerate";
 	private static final String RUN_FRAMERATE = "runFramerate";
 	private static final String SIT_FRAMERATE = "sitFramerate";
+	private static final String SHARPEN_FRAMERATE = "sharpenFramerate";
 	private static final String SCRATCH_FRAMERATE = "scratchFramerate";
-	private static final String SLEEP_FRAMERATE = "sleepFramerate";
 	private static final String LOAD_FRAMERATE = "loadFramerate";
+	private static final String SLEEP_DELAY = "sleepDelay";
+	private static final String YAWN_DELAY = "yawnDelay";
+	private static final String SURPRISE_DELAY = "surpriseDelay";
 
 	private Settings settings;
 	private int triggerDist;
@@ -53,8 +56,11 @@ public class NekoSettings {
 	private int runDelay;
 	private int sitDelay;
 	private int scratchDelay;
-	private int sleepDelay;
+	private int sharpenDelay;
 	private int loadDelay;
+	private int sleepDelay;
+	private int yawnDelay;
+	private int surpriseDelay;
 
 	public NekoSettings() {
 		settings=new Settings("neko.properties");
@@ -79,8 +85,11 @@ public class NekoSettings {
 	public int getRunDelay() { return runDelay;}
 	public int getSitDelay() { return sitDelay;}
 	public int getScratchDelay() { return scratchDelay;}
-	public int getSleepDelay() { return sleepDelay;}
+	public int getSharpenDelay() { return sharpenDelay;}
 	public int getLoadDelay() { return loadDelay;}
+	public int getSleepDelay() { return sleepDelay;}
+	public int getYawnDelay() { return yawnDelay;}
+	public int getSurpriseDelay() { return surpriseDelay;}
 
 	public void load()
 	{
@@ -88,15 +97,24 @@ public class NekoSettings {
 		String hello=settings.getString(HELLO);
 		if ( hello!=null ) System.out.println(hello);
 
-		triggerDist=16;
-		Integer i = settings.getInt(TRIGGER_DIST);
+		Integer i;
+		i = settings.getInt(TRIGGER_DIST);
 		triggerDist=(i==null)?16:i;
+
+		i = settings.getInt(SLEEP_DELAY);
+		sleepDelay=(i==null)?1000:i;
+
+		i = settings.getInt(YAWN_DELAY);
+		yawnDelay=(i==null)?1000:i;
+
+		i = settings.getInt(SURPRISE_DELAY);
+		surpriseDelay=(i==null)?1000:i;
 
 		minDelay=getDelay(MAX_FRAMERATE);
 		runDelay=getDelay(RUN_FRAMERATE);
 		sitDelay=getDelay(SIT_FRAMERATE);
 		scratchDelay=getDelay(SCRATCH_FRAMERATE);
-		sleepDelay=getDelay(SLEEP_FRAMERATE);
+		sharpenDelay=getDelay(SHARPEN_FRAMERATE);
 		loadDelay=getDelay(LOAD_FRAMERATE);
 	}
 

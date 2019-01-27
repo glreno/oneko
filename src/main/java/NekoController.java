@@ -104,7 +104,7 @@ public class NekoController {
 		catbox.setSize(16*w, 9*h);
 
 
-		timer = new Timer(200, new ActionListener() {
+		timer = new Timer(100, new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -119,10 +119,13 @@ public class NekoController {
 	}
 
 	private void loadKitten() {
+		// Note: The files start with 1. image[0] is a copy of 25.
+		// image[0] is a default, image[25] is part of the wash animation with image[31]
 		image = new ImageIcon[33];
 		for (int i = 1; i <= 32; i++) {
 			image[i] = new ImageIcon(Neko.class.getResource("images/" + i + ".GIF"));
 		}
+		image[0]=image[25];
 	}
 
 	public int getWidth() { return w;}
@@ -148,10 +151,10 @@ public class NekoController {
 			Insets paneInsets=catbox.getContentPane().getInsets();
 			Dimension sz=catbox.getContentPane().getSize();
 
-			nekoBounds.x = panePoint.x + paneInsets.left + 16;
-			nekoBounds.y = panePoint.y + paneInsets.top + 32;
-			nekoBounds.width = sz.width - paneInsets.left - paneInsets.right - 32;
-			nekoBounds.height = sz.height - paneInsets.left - paneInsets.top - 32;
+			nekoBounds.x = panePoint.x + paneInsets.left + w/2;
+			nekoBounds.y = panePoint.y + paneInsets.top + h;
+			nekoBounds.width = sz.width - paneInsets.left - paneInsets.right - w;
+			nekoBounds.height = sz.height - paneInsets.left - paneInsets.top - h;
 		}
 		else
 		{
@@ -165,10 +168,10 @@ public class NekoController {
 			Insets screenInsets = tk.getScreenInsets(gc);
 			if ( screenInsets==null) return;
 			// nekoBounds is the area of the screen that the Neko can be in
-			nekoBounds.x = screenBounds.x + screenInsets.left + 16;
-			nekoBounds.y = screenBounds.y + screenInsets.top + 32;
-			nekoBounds.width = screenBounds.width - screenInsets.left - screenInsets.right - 32;
-			nekoBounds.height = screenBounds.height - screenInsets.left - screenInsets.top - 32;
+			nekoBounds.x = screenBounds.x + screenInsets.left + w/2;
+			nekoBounds.y = screenBounds.y + screenInsets.top + h;
+			nekoBounds.width = screenBounds.width - screenInsets.left - screenInsets.right - w;
+			nekoBounds.height = screenBounds.height - screenInsets.left - screenInsets.top - h;
 		}
 
 		//Determines what the cat should do, if the mouse moves
@@ -197,7 +200,8 @@ public class NekoController {
 			x = mx;
 			y = my;
 			if (move) {
-				slp = Math.min(slp, settings.getMinDelay() ); // 10fps, 100ms
+				// Mouse moved! Wake up or change direction immediately!
+				//slp = Math.min(slp, settings.getMinDelay() ); // 10fps, 100ms
 			}
 
 		}
@@ -273,12 +277,11 @@ public class NekoController {
 		} else {   //-if the mouse hasn't moved or the cat's over the mouse-
 			ox = x;
 			oy = y;
-			slp = settings.getSitDelay();
 			switch (no) {
-				case 25: //<cat sit>
+				case 0: //<cat sit>
 					//If the mouse is outside the applet
 					if (out == true) {
-						slp = settings.getScratchDelay();
+						slp = settings.getSharpenDelay();
 						switch (pos) {
 							case over:
 								no = 17;
@@ -293,17 +296,19 @@ public class NekoController {
 								no = 19;
 								break;
 							default:
+								slp = settings.getSitDelay();
 								no = 31;
 								break;
 						}
 						pos = 0;
 						break;
 					}
+					slp = settings.getSitDelay();
 					no = 31;
 					break; //<31: cat lick>
 				//
 				case 17: //The mouse is outside, above applet
-					slp = settings.getScratchDelay();
+					slp = settings.getSharpenDelay();
 					no = 18;	//show images 17 & 18, 6 times
 					ilc1++;
 					if (ilc1 == 6) {
@@ -313,11 +318,12 @@ public class NekoController {
 					break;
 				//
 				case 18:
+					slp = settings.getSharpenDelay();
 					no = 17;
 					break;
 				//
 				case 21: //The mouse is outside, under applet
-					slp = settings.getScratchDelay();
+					slp = settings.getSharpenDelay();
 					no = 22;	//show images 21 & 22, 6 times
 					ilc1++;
 					if (ilc1 == 6) {
@@ -327,11 +333,12 @@ public class NekoController {
 					break;
 				//
 				case 22:
+					slp = settings.getSharpenDelay();
 					no = 21;
 					break;
 				//
 				case 23: //the mouse is outside, left
-					slp = settings.getScratchDelay();
+					slp = settings.getSharpenDelay();
 					no = 24;	//show images 23 & 24, 6 times
 					ilc1++;
 					if (ilc1 == 6) {
@@ -341,11 +348,12 @@ public class NekoController {
 					break;
 				//
 				case 24:
+					slp = settings.getSharpenDelay();
 					no = 23;
 					break;
 				//
 				case 19: //The mouse is outside, right
-					slp = settings.getScratchDelay();
+					slp = settings.getSharpenDelay();
 					no = 20;	//show images 19 & 20, 6 times
 					ilc1++;
 					if (ilc1 == 6) {
@@ -355,16 +363,24 @@ public class NekoController {
 					break;
 				//
 				case 20:
+					slp = settings.getSharpenDelay();
 					no = 19;
 					break;
 				//
 				case 31: //cat lick (6  times)
+					slp = settings.getSitDelay();
 					no = 25;
 					ilc1++;
 					if (ilc1 == 6) {
+						slp = settings.getScratchDelay();
 						no = 27;
 						ilc1 = 0;
 					}
+					break;
+				//
+				case 25:
+					slp = settings.getSitDelay();
+					no = 31;
 					break;
 				//
 				case 27:
@@ -376,6 +392,7 @@ public class NekoController {
 					ilc2++;
 					if (ilc2 == 4) {
 						no = 26;
+						slp = settings.getYawnDelay();
 						ilc2 = 0;
 					}
 					break;
@@ -392,11 +409,12 @@ public class NekoController {
 					slp = settings.getSleepDelay();
 					break;
 				default:
-					no = 25;
+					no = 0;
 					break;
 			}
 			if (move == true) {
 				//re-initialize some variables
+				slp = settings.getSurpriseDelay();
 				no = 32;
 				ilc1 = 0;
 				ilc2 = 0;
