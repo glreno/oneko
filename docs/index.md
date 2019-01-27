@@ -1,4 +1,4 @@
-oneko ![img](https://github.com/glreno/oneko/blob/master/src/main/resources/images/25.GIF) 
+oneko ![img](25.GIF) 
 =====
 
 The ever popular kitty-that-follows-your-mouse-pointer toy.
