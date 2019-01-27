@@ -24,6 +24,10 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JFrame;
@@ -88,10 +92,16 @@ public class Neko {
 		freeLabel = new JLabel();
 		boxLabel = new JLabel();
 
-		FormListener formListener = new FormListener();
+		MouseListener mouseMoveListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent evt) {
+				if ((evt.getSource() == freeLabel)||(evt.getSource() == boxLabel)) {
+					imageClicked(evt);
+				}
+			}
+		};
 
-		freeLabel.addMouseListener(formListener);
-		boxLabel.addMouseListener(formListener);
+		freeLabel.addMouseListener(mouseMoveListener);
+		boxLabel.addMouseListener(mouseMoveListener);
 		invisibleWindow.getContentPane().add(freeLabel, BorderLayout.CENTER);
 		catbox.getContentPane().add(boxLabel);
 		catbox.pack();
@@ -106,30 +116,13 @@ public class Neko {
 			public void removeLayoutComponent(Component c) {}
 		});
 
-		invisibleWindow.pack();
-	}
-
-	// Code for dispatching events from components to event handlers.
-
-	private class FormListener implements MouseListener {
-		FormListener() {}
-		public void mouseClicked(MouseEvent evt) {
-			if ((evt.getSource() == freeLabel)||(evt.getSource() == boxLabel)) {
-				Neko.this.imageClicked(evt);
+		catbox.addComponentListener(new ComponentAdapter() {
+			public void componentMoved(ComponentEvent e) {
+				controller.catboxMoved();
 			}
-		}
+		});
 
-		public void mouseEntered(MouseEvent evt) {
-		}
-
-		public void mouseExited(MouseEvent evt) {
-		}
-
-		public void mousePressed(MouseEvent evt) {
-		}
-
-		public void mouseReleased(MouseEvent evt) {
-		}
+		invisibleWindow.pack();
 	}
 
 	private void imageClicked(MouseEvent evt) {
@@ -156,11 +149,7 @@ public class Neko {
 			String title=settings.getTitle();
 			if ( title==null ) title="Neko";
 			catbox.setTitle(title);
-			Point p=invisibleWindow.getLocation();
 			invisibleWindow.setVisible(false);
-
-			Dimension d=catbox.getSize();
-			catbox.setLocation(p.x-d.width/2,Math.max(0,p.y-d.height/2));
 
 			catbox.setVisible(true);
 		}
@@ -168,6 +157,7 @@ public class Neko {
 			catbox.setVisible(false);
 			invisibleWindow.setVisible(true);
 		}
+		controller.moveCatInBox();
 	}
 
 }
