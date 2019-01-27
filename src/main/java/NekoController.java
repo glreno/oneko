@@ -54,16 +54,11 @@ public class NekoController {
 	//Constants
 
 	private static final double pi = Math.PI;
-	private static final int over = 1;
-	private static final int under = 2;
-	private static final int left = 3;
-	private static final int right = 4;
+	private enum Position { OVER, UNDER, LEFT, RIGHT };
 
 	//
 	//Variables
 	private boolean windowMode;
-	private int pos;	  //neko's position (over,under,left,right)
-	private int x, y;	 //mouse pos.
 	private int ox, oy;   //image pos.
 	private int no;	   //image number.
 	private int init;	 //for image loading initialize counter
@@ -72,9 +67,6 @@ public class NekoController {
 	private int ilc1;	 //image loop counter
 	private int ilc2;	 //second loop counter
 	private boolean mouseMoved; //mouse move, flag
-	private boolean out;  //mouse exiseted, flag
-	private double theta;//image-mouse polar data
-	private double dist;  //distance
 	private ImageIcon image[];  //images
 	private Point windowOffset = new Point(-16, -30);
 	private Rectangle nekoBounds = new Rectangle();
@@ -90,14 +82,17 @@ public class NekoController {
 
 	/** Creates new form Neko */
 	public NekoController(NekoSettings settings,JWindow invisibleWindow,JFrame visibleWindow,JLabel free,JLabel boxed) {
-		this.init=0;
-		this.state=0;
 		this.settings=settings;
 		this.invisibleWindow=invisibleWindow;
 		this.catbox=visibleWindow;
 		this.freeLabel=free;
 		this.boxLabel=boxed;
 		this.windowMode=false;
+
+		this.init=0;
+		this.state=0;
+		this.slp=0;
+
 		loadKitten();
 		w=image[1].getIconWidth();
 		h=image[1].getIconHeight();
@@ -105,7 +100,6 @@ public class NekoController {
 		//invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
 		boxLabel.setSize(w,h);
 		catbox.setSize(16*w, 9*h);
-
 
 		timer = new Timer(50, new ActionListener() {
 
@@ -133,20 +127,10 @@ public class NekoController {
 
 	public int getWidth() { return w;}
 	public int getHeight() { return h;}
-	public void setWindowMode(boolean windowed) { this.windowMode=windowed;}
 	public boolean getWindowMode() { return this.windowMode;}
 
-
-	/** Locates the mouse on the screen and determines what the cat shall do. */
-	public void locateMouseAndAnimateCat() {
-		PointerInfo pointerInfo = MouseInfo.getPointerInfo();
-		if (pointerInfo==null) return;
-		Point mouseLocation = pointerInfo.getLocation();
-		if (mouseLocation==null) return;
-
-		int mx = mouseLocation.x;
-		int my = mouseLocation.y;
-
+	private void calculateBounds(PointerInfo pointerInfo)
+	{
 		if(windowMode)
 		{
 			// nekoBounds is the area of the window that the Neko can be in
@@ -176,27 +160,41 @@ public class NekoController {
 			nekoBounds.width = screenBounds.width - screenInsets.left - screenInsets.right - w;
 			nekoBounds.height = screenBounds.height - screenInsets.left - screenInsets.top - h;
 		}
+	}
+
+	/** Locates the mouse on the screen and determines what the cat shall do. */
+	public void locateMouseAndAnimateCat() {
+		PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+		if (pointerInfo==null) return;
+		Point mouseLocation = pointerInfo.getLocation();
+		if (mouseLocation==null) return;
+
+		int mx = mouseLocation.x;
+		int my = mouseLocation.y;
+
+		calculateBounds(pointerInfo);
 
 		//Determines what the cat should do, if the mouse moves
-		out = !nekoBounds.contains(mx, my);
-		x = mx;
-		y = my;
+		Position pos = null;
+		boolean out = !nekoBounds.contains(mx, my);
+		int x = mx;
+		int y = my;
 		if (out) {
 			if (y < nekoBounds.y) {
 				y = nekoBounds.y;
-				pos = over;
+				pos = Position.OVER;
 			}
 			if (y > nekoBounds.y + nekoBounds.height) {
 				y = nekoBounds.y + nekoBounds.height;
-				pos = under;
+				pos = Position.UNDER;
 			}
 			if (x < nekoBounds.x) {
 				x = nekoBounds.x;
-				pos = left;
+				pos = Position.LEFT;
 			}
 			if (x > nekoBounds.x + nekoBounds.width) {
 				x = nekoBounds.x + nekoBounds.width;
-				pos = right;
+				pos = Position.RIGHT;
 			}
 		}
 
@@ -205,19 +203,19 @@ public class NekoController {
 		// ox,oy are the old neko location on screen
 		int dx = x - ox;
 		int dy = oy - y;
-		dist = Math.sqrt(dx * dx + dy * dy); //distance formula (from mouse to cat)
-		theta = Math.atan2(dy, dx);	 //angle from mouse to cat
+		double dist = Math.sqrt(dx * dx + dy * dy); //distance formula (from mouse to cat)
+		double theta = Math.atan2(dy, dx);	 //angle from mouse to cat
 
 		mouseMoved = mouseMoved || dist > settings.getTriggerDist();
 		//
 		slp = Math.max(0, slp - timer.getDelay());
 		if (slp == 0)
 		{
-			animateCat();
+			animateCat(pos,theta,dist);
 		}
 	}
 
-	private void animateCat()
+	private void animateCat(Position pos,double theta,double dist)
 	{
 		// There are four states.
 		// 0. Initialization (init<33)
@@ -306,19 +304,19 @@ public class NekoController {
 			switch (no) {
 				case 0: //<cat sit>
 					//If the mouse is outside the applet
-					if (out == true) {
+					if (pos != null) {
 						slp = settings.getSharpenDelay();
 						switch (pos) {
-							case over:
+							case OVER:
 								no = 17;
 								break;
-							case under:
+							case UNDER:
 								no = 21;
 								break;
-							case left:
+							case LEFT:
 								no = 23;
 								break;
-							case right:
+							case RIGHT:
 								no = 19;
 								break;
 							default:
@@ -326,7 +324,6 @@ public class NekoController {
 								no = 31;
 								break;
 						}
-						pos = 0;
 						break;
 					}
 					slp = settings.getSitDelay();
@@ -453,16 +450,53 @@ public class NekoController {
 		//draw the new image
 		if ( doMove )
 		{
-			if(windowMode) {
-				// note that ox,oy are screen-relative
-				boxLabel.setLocation(ox-nekoBounds.x, oy-nekoBounds.y);
-			}
-			else {
-				invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
-			}
+			moveCat();
 		}
 		freeLabel.setIcon(image[no]);
 		boxLabel.setIcon(image[no]);
+	}
+
+	private void moveCat() {
+		if(windowMode) {
+			// note that ox,oy are screen-relative
+			boxLabel.setLocation(ox-nekoBounds.x, oy-nekoBounds.y);
+		}
+		else {
+			invisibleWindow.setLocation(ox + windowOffset.x, oy + windowOffset.y);
+		}
+	}
+
+	public void setWindowMode(boolean windowed) {
+		this.windowMode=windowed;
+	}
+
+	public void moveCatInBox() {
+		if ( windowMode ) {
+			Dimension d=catbox.getSize();
+			catbox.setLocation(ox-d.width/2,Math.max(0,oy-d.height/2));
+		}
+		PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+		if (pointerInfo==null) return;
+		calculateBounds(pointerInfo);
+		moveCat();
+	}
+
+	public void catboxMoved() {
+		if ( windowMode ) {
+			// The window moved. We have the old location in nekoBounds.
+			int oldx=nekoBounds.x;
+			int oldy=nekoBounds.y;
+			// Calculate the new nekoBounds
+			PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+			if (pointerInfo==null) return;
+			calculateBounds(pointerInfo);
+			// How much did it move?
+			int dx=nekoBounds.x-oldx;
+			int dy=nekoBounds.y-oldy;
+			ox+=dx;
+			oy+=dy;
+			// don't need to move the jlabel, it will have moved with the window
+		}
 	}
 
 }
