@@ -1,5 +1,5 @@
 /*
- * @(#)Neko.java  1.1  2019-01-24
+ * @(#)Settings.java  1.1  2019-01-27
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -18,13 +18,11 @@ import java.util.Properties;
 public class Settings {
 	private String fn;
 	private File homefile;
-	private Path homepath;
 	private Properties builtin;
 	private Properties override;
 
 	/** Load all of the properties in src/main/resources/filename
-	 * and the file ~/filename; and start a watcher
-	 * on the file.
+	 * and the file ~/filename
 	 */
 	public Settings(String filename)
 	{
@@ -33,12 +31,11 @@ public class Settings {
 		override=new Properties();
 		String home=System.getProperty("user.home");
 		homefile=new File(home,fn);
-		homepath=homefile.toPath();
-		// Need to register a Watcher on that to reload on the fly
 	}
 
 	public void load()
 	{
+		builtin.clear();
 		InputStream in=null;
 		try
 		{
@@ -63,12 +60,13 @@ public class Settings {
 
 	public void loadOverride()
 	{
+		override.clear();
 		if ( homefile==null || !homefile.exists() ) return;
 		InputStream in=null;
 		try
 		{
 			in=new FileInputStream(homefile);
-			builtin.load(in);
+			override.load(in);
 		}
 		catch (IOException e)
 		{
