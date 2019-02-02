@@ -1,4 +1,4 @@
-oneko ![img](25.GIF) 
+oneko ![img](Neko_animated.gif) 
 =====
 
 The ever popular kitty-that-follows-your-mouse-pointer toy.
@@ -16,4 +16,11 @@ The Java code for v.2.0 (c) 2019 Gerald Reno
 
 Download executable jar
 =====
-[Download v.2.0.0](https://glreno.github.io/oneko/oneko-2.0.0.jar)
+[Download v.2.0.1](https://glreno.github.io/oneko/oneko-2.0.1.jar)
+
+links
+=====
+
+[Source](https://github.com/glreno/oneko)
+[Project wiki](https://github.com/glreno/oneko/wiki)
+[History](https://en.wikipedia.org/wiki/Neko_(software)) 

@@ -1,5 +1,5 @@
 /*
- * @(#)Neko.java  2.0  2019-01-27
+ * @(#)Neko.java  2.0.1  2019-02-29
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -30,6 +30,9 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
@@ -121,6 +124,11 @@ public class Neko {
 				controller.catboxMoved();
 			}
 		});
+		catbox.addWindowListener(new WindowAdapter() {
+			public void windowDeiconified(WindowEvent e) {
+				controller.catboxDeiconified();
+			}
+		});
 
 		invisibleWindow.pack();
 	}
@@ -136,7 +144,7 @@ public class Neko {
 		EventQueue.invokeLater(new Runnable() {
 
 			public void run() {
-				new Neko().setWindowMode(false);
+				new Neko();
 			}
 		});
 	}
