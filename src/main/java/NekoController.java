@@ -206,6 +206,8 @@ public class NekoController {
 		double dist = Math.sqrt(dx * dx + dy * dy); //distance formula (from mouse to cat)
 		double theta = Math.atan2(dy, dx);	 //angle from mouse to cat
 
+		// If the kitty is already moving, keep moving;
+		// If not moving, but the mouse is over 64px away, wake up!
 		mouseMoved = mouseMoved || dist > settings.getTriggerDist();
 		//
 		slp = Math.max(0, slp - timer.getDelay());
@@ -223,7 +225,6 @@ public class NekoController {
 		// 2. sleeping or preparing to sleep
 		// 3. Surprised (was asleep, but the mouse moved) (no=32)
 		boolean doMove=false;
-		int triggerDist = settings.getTriggerDist();
 		if ( state==0 ) {
 			if (init < 33) {
 				doMove=true;
@@ -479,6 +480,16 @@ public class NekoController {
 		if (pointerInfo==null) return;
 		calculateBounds(pointerInfo);
 		moveCat();
+	}
+
+	public void catboxDeiconified() {
+		// Calculate the new nekoBounds
+		PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+		if (pointerInfo==null) return;
+		calculateBounds(pointerInfo);
+		// Move the cat to the center of the window
+		ox=nekoBounds.x+nekoBounds.width/2;
+		oy=nekoBounds.y+nekoBounds.height/2;
 	}
 
 	public void catboxMoved() {
