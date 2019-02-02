@@ -1,5 +1,5 @@
 /*
- * @(#)Settings.java  2.0  2019-01-27
+ * @(#)Settings.java  2.0.01  2019-02-02
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -84,15 +84,25 @@ public class Settings {
 
 	public String getString(String key)
 	{
+		return getString(key,null);
+	}
+
+	public String getString(String key,String def)
+	{
 		Object ret=null;
 		ret=override.get(key);
 		if ( ret!=null ) return ret.toString();
 		ret=builtin.get(key);
 		if ( ret!=null ) return ret.toString();
-		return null;
+		return def;
 	}
 
 	public Integer getInt(String key)
+	{
+		return getInt(key,null);
+	}
+
+	public Integer getInt(String key, Integer def)
 	{
 		Object ret=null;
 		ret=override.get(key);
@@ -117,7 +127,7 @@ public class Settings {
 			}
 			catch (NumberFormatException e) { }
 		}
-		return null;
+		return def;
 	}
 
 }

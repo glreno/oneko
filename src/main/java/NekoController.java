@@ -1,5 +1,5 @@
 /*
- * @(#)NekoController.java  2.0  2019-01-27
+ * @(#)NekoController.java  2.0.1  2019-02-02
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -144,7 +144,7 @@ public class NekoController {
 			nekoBounds.height = sz.height - paneInsets.left - paneInsets.top - h;
 		}
 		else
-		{
+	{
 			GraphicsDevice mouseMonitor=pointerInfo.getDevice();
 			if (mouseMonitor==null) return;
 			GraphicsConfiguration gc = mouseMonitor.getDefaultConfiguration();
@@ -169,8 +169,8 @@ public class NekoController {
 		Point mouseLocation = pointerInfo.getLocation();
 		if (mouseLocation==null) return;
 
-		int mx = mouseLocation.x;
-		int my = mouseLocation.y;
+		int mx = mouseLocation.x + settings.getOffsetX();
+		int my = mouseLocation.y + settings.getOffsetY();
 
 		calculateBounds(pointerInfo);
 

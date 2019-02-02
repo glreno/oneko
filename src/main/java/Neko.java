@@ -1,5 +1,5 @@
 /*
- * @(#)Neko.java  2.0  2019-01-27
+ * @(#)Neko.java  2.0.1  2019-02-29
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -136,7 +136,7 @@ public class Neko {
 		EventQueue.invokeLater(new Runnable() {
 
 			public void run() {
-				new Neko().setWindowMode(false);
+				new Neko();
 			}
 		});
 	}

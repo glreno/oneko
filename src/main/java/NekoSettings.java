@@ -1,5 +1,5 @@
 /*
- * @(#)NekoSettings.java  2.0  2019-01-27
+ * @(#)NekoSettings.java  2.0.1  2019-02-02
  *
  * Copyright (c) 2019 Jerry Reno
  * This is public domain software, under the terms of the UNLICENSE
@@ -37,9 +37,12 @@ public class NekoSettings {
 	// Settings keys:
 	private static final String HELLO = "hello";
 	private static final String TITLE = "windowTitle";
+
 	private static final String TRIGGER_DIST = "triggerDistance";
 	private static final String CATCH_DIST = "catchDistance";
 	private static final String RUN_DIST = "runDistancePerFrame";
+	private static final String OFFSETX = "offsetx";
+	private static final String OFFSETY = "offsety";
 
 	private static final String MAX_FRAMERATE = "maxFramerate";
 	private static final String RUN_FRAMERATE = "runFramerate";
@@ -47,6 +50,7 @@ public class NekoSettings {
 	private static final String SHARPEN_FRAMERATE = "sharpenFramerate";
 	private static final String SCRATCH_FRAMERATE = "scratchFramerate";
 	private static final String LOAD_FRAMERATE = "loadFramerate";
+
 	private static final String SLEEP_DELAY = "sleepDelay";
 	private static final String YAWN_DELAY = "yawnDelay";
 	private static final String SURPRISE_DELAY = "surpriseDelay";
@@ -64,6 +68,8 @@ public class NekoSettings {
 	private int sleepDelay;
 	private int yawnDelay;
 	private int surpriseDelay;
+	private int offsetX;
+	private int offsetY;
 
 	public NekoSettings() {
 		settings=new Settings("neko.properties");
@@ -76,9 +82,7 @@ public class NekoSettings {
 	private int getDelay(String key)
 	{
 		// Convert the framerate settings into milliseconds
-		Integer ret = settings.getInt(key);
-		if ( ret==null )
-			return 100;
+		Integer ret = settings.getInt(key,100);
 
 		return 1000/ret;
 	}
@@ -86,6 +90,8 @@ public class NekoSettings {
 	public int getTriggerDist() { return triggerDist;}
 	public int getCatchDist() { return catchDist;}
 	public int getRunDist() { return runDist;}
+	public int getOffsetX() { return offsetX;}
+	public int getOffsetY() { return offsetY;}
 	public int getMinDelay() { return minDelay;}
 	public int getRunDelay() { return runDelay;}
 	public int getSitDelay() { return sitDelay;}
@@ -102,24 +108,15 @@ public class NekoSettings {
 		String hello=settings.getString(HELLO);
 		if ( hello!=null ) System.out.println(hello);
 
-		Integer i;
-		i = settings.getInt(TRIGGER_DIST);
-		triggerDist=(i==null)?16:i;
+		triggerDist = settings.getInt(TRIGGER_DIST,16);
+		catchDist = settings.getInt(CATCH_DIST,16);
+		runDist = settings.getInt(RUN_DIST,16);
+		offsetX = settings.getInt(OFFSETX,0);
+		offsetY = settings.getInt(OFFSETY,0);
 
-		i = settings.getInt(CATCH_DIST);
-		catchDist=(i==null)?16:i;
-
-		i = settings.getInt(RUN_DIST);
-		runDist=(i==null)?16:i;
-
-		i = settings.getInt(SLEEP_DELAY);
-		sleepDelay=(i==null)?1000:i;
-
-		i = settings.getInt(YAWN_DELAY);
-		yawnDelay=(i==null)?1000:i;
-
-		i = settings.getInt(SURPRISE_DELAY);
-		surpriseDelay=(i==null)?1000:i;
+		sleepDelay = settings.getInt(SLEEP_DELAY,1000);
+		yawnDelay = settings.getInt(YAWN_DELAY,1000);
+		surpriseDelay = settings.getInt(SURPRISE_DELAY,1000);
 
 		minDelay=getDelay(MAX_FRAMERATE);
 		runDelay=getDelay(RUN_FRAMERATE);
@@ -127,6 +124,7 @@ public class NekoSettings {
 		scratchDelay=getDelay(SCRATCH_FRAMERATE);
 		sharpenDelay=getDelay(SHARPEN_FRAMERATE);
 		loadDelay=getDelay(LOAD_FRAMERATE);
+
 	}
 
 }
