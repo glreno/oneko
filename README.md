@@ -14,3 +14,9 @@ The image files are ancient public domain.
 The Java code for v.1.0 is (c) 2010 Werner Randelhofer.
 The Java code for v.2.0 (c) 2019 Gerald Reno
 
+links
+=====
+
+[Download](https://glreno.github.io/oneko)
+[Project wiki](https://github.com/glreno/oneko/wiki)
+
